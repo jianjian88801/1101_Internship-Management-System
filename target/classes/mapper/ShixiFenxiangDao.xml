@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShixiFenxiangDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.xuesheng_id as xueshengId
+        ,a.shixi_fenxiang_name as shixiFenxiangName
+        ,a.shixi_fenxiang_photo as shixiFenxiangPhoto
+        ,a.shixi_fenxiang_types as shixiFenxiangTypes
+        ,a.shixi_fenxiang_clicknum as shixiFenxiangClicknum
+        ,a.shixi_fenxiang_content as shixiFenxiangContent
+        ,a.shixi_fenxiang_delete as shixiFenxiangDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShixiFenxiangView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,xuesheng.xuesheng_uuid_number as xueshengUuidNumber
+        ,xuesheng.xuesheng_name as xueshengName
+        ,xuesheng.xuesheng_phone as xueshengPhone
+        ,xuesheng.xuesheng_id_number as xueshengIdNumber
+        ,xuesheng.xuesheng_photo as xueshengPhoto
+        ,xuesheng.yuanxi_types as yuanxiTypes
+        ,xuesheng.banji_types as banjiTypes
+        ,xuesheng.xuesheng_email as xueshengEmail
+
+        FROM shixi_fenxiang  a
+        left JOIN xuesheng xuesheng ON a.xuesheng_id = xuesheng.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.xueshengId != null and params.xueshengId != ''">
+                and (
+                    a.xuesheng_id = #{params.xueshengId}
+                )
+            </if>
+            <if test=" params.shixiFenxiangName != '' and params.shixiFenxiangName != null and params.shixiFenxiangName != 'null' ">
+                and a.shixi_fenxiang_name like CONCAT('%',#{params.shixiFenxiangName},'%')
+            </if>
+            <if test="params.shixiFenxiangTypes != null and params.shixiFenxiangTypes != ''">
+                and a.shixi_fenxiang_types = #{params.shixiFenxiangTypes}
+            </if>
+            <if test="params.shixiFenxiangClicknumStart != null and params.shixiFenxiangClicknumStart != ''">
+                <![CDATA[  and a.shixi_fenxiang_clicknum >= #{params.shixiFenxiangClicknumStart}   ]]>
+            </if>
+            <if test="params.shixiFenxiangClicknumEnd != null and params.shixiFenxiangClicknumEnd != ''">
+                <![CDATA[  and a.shixi_fenxiang_clicknum <= #{params.shixiFenxiangClicknumEnd}   ]]>
+            </if>
+             <if test="params.shixiFenxiangClicknum != null and params.shixiFenxiangClicknum != ''">
+                and a.shixi_fenxiang_clicknum = #{params.shixiFenxiangClicknum}
+             </if>
+            <if test=" params.shixiFenxiangContent != '' and params.shixiFenxiangContent != null and params.shixiFenxiangContent != 'null' ">
+                and a.shixi_fenxiang_content like CONCAT('%',#{params.shixiFenxiangContent},'%')
+            </if>
+            <if test="params.shixiFenxiangDeleteStart != null and params.shixiFenxiangDeleteStart != ''">
+                <![CDATA[  and a.shixi_fenxiang_delete >= #{params.shixiFenxiangDeleteStart}   ]]>
+            </if>
+            <if test="params.shixiFenxiangDeleteEnd != null and params.shixiFenxiangDeleteEnd != ''">
+                <![CDATA[  and a.shixi_fenxiang_delete <= #{params.shixiFenxiangDeleteEnd}   ]]>
+            </if>
+             <if test="params.shixiFenxiangDelete != null and params.shixiFenxiangDelete != ''">
+                and a.shixi_fenxiang_delete = #{params.shixiFenxiangDelete}
+             </if>
+
+                <!-- 判断学生的id不为空 -->
+            <if test=" params.xueshengIdNotNull != '' and params.xueshengIdNotNull != null and params.xueshengIdNotNull != 'null' ">
+                and a.xuesheng_id IS NOT NULL
+            </if>
+            <if test=" params.xueshengUuidNumber != '' and params.xueshengUuidNumber != null and params.xueshengUuidNumber != 'null' ">
+                and xuesheng.xuesheng_uuid_number like CONCAT('%',#{params.xueshengUuidNumber},'%')
+            </if>
+            <if test=" params.xueshengName != '' and params.xueshengName != null and params.xueshengName != 'null' ">
+                and xuesheng.xuesheng_name like CONCAT('%',#{params.xueshengName},'%')
+            </if>
+            <if test=" params.xueshengPhone != '' and params.xueshengPhone != null and params.xueshengPhone != 'null' ">
+                and xuesheng.xuesheng_phone like CONCAT('%',#{params.xueshengPhone},'%')
+            </if>
+            <if test=" params.xueshengIdNumber != '' and params.xueshengIdNumber != null and params.xueshengIdNumber != 'null' ">
+                and xuesheng.xuesheng_id_number like CONCAT('%',#{params.xueshengIdNumber},'%')
+            </if>
+            <if test="params.yuanxiTypes != null  and params.yuanxiTypes != ''">
+                and xuesheng.yuanxi_types = #{params.yuanxiTypes}
+            </if>
+
+            <if test="params.banjiTypes != null  and params.banjiTypes != ''">
+                and xuesheng.banji_types = #{params.banjiTypes}
+            </if>
+
+            <if test=" params.xueshengEmail != '' and params.xueshengEmail != null and params.xueshengEmail != 'null' ">
+                and xuesheng.xuesheng_email like CONCAT('%',#{params.xueshengEmail},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
